@@ -107,13 +107,25 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
           </div>
         ) : null}
       </div>
-      <ToolButton
-        icon={
-          <IoTrashOutline size={20} color="#fff" onClick={handleTrashClick} />
-        }
-        isSelected={strokeSetting.type === "pen"}
-        tooltipText="Clear"
-      />
+      <div className="flex items-center">
+        <ToolButton
+          icon={<LuUndo size={20} color="#fff" onClick={() => {}} />}
+          isSelected={strokeSetting.type === "pen"}
+          tooltipText="Undo"
+        />
+        <ToolButton
+          icon={<LuRedo size={20} color="#fff" onClick={() => {}} />}
+          isSelected={strokeSetting.type === "pen"}
+          tooltipText="Redo"
+        />
+        <ToolButton
+          icon={
+            <IoTrashOutline size={20} color="#fff" onClick={handleTrashClick} />
+          }
+          isSelected={strokeSetting.type === "pen"}
+          tooltipText="Clear"
+        />
+      </div>
     </div>
   );
 };
