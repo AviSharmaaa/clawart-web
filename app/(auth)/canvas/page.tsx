@@ -11,7 +11,10 @@ const strokeSettings: Record<StrokeType, StrokeConfig> = {
 };
 
 export default function Canvas() {
-  const { canvasRef, onMouseDown, clearCanvas } = useCanvas(drawLine);
+  const { canvasRef, onMouseDown, clearCanvas } = useCanvas(
+    handleMouseUp,
+    handleMouseMove
+  );
   const [text, setText] = useState<string>("Untitled");
   const [strokeColor, setStrokeColor] = useState<string>("#ffffff");
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
@@ -19,13 +22,26 @@ export default function Canvas() {
     strokeSettings["pencil"]
   );
 
+  const [history, setHistory] = useState<Path[]>([]);
+  const [pathPoints, setPathPoints] = useState<Point[]>([]);
+
   const eraserColor = "#000000";
+
+  const handleMouseDown = () => {
+    const newPath: Path = {
+      points: [],
+      strokeColor: strokeColor,
+      strokeConfig: strokeSetting,
+    };
+    setHistory((prevHistory) => [...prevHistory, newPath]);
+    onMouseDown();
+  };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
   };
 
-  const handleColorChange = (color: any) => {
+  const handleColorChange = (color: { hex: string }) => {
     setStrokeColor(color.hex);
   };
 
@@ -33,25 +49,51 @@ export default function Canvas() {
     setStrokeSetting(strokeSettings[strokeType]);
   };
 
-  const handleTrashClick = () => {
+  const handleClearClick = () => {
     clearCanvas();
+    setPathPoints([]);
+    setHistory([]);
   };
 
-  function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
-    const { x: currX, y: currY } = currentPoint;
+  function handleMouseUp() {
+    setPathPoints([]);
+  }
 
-    let strokeStyle =
-      strokeSetting.type === "eraser" ? eraserColor : strokeColor;
+  function handleMouseMove(ctx: CanvasRenderingContext2D, point: Point) {
+    setPathPoints((prevPoints) => {
+      const updatedPoints = [...prevPoints, point];
+      updateHistory(updatedPoints);
+      return updatedPoints;
+    });
+    drawLine(ctx);
+  }
 
-    let startPoint = prevPoint ?? currentPoint;
-    ctx.beginPath();
-    ctx.lineWidth = strokeSetting.width;
-    ctx.strokeStyle = strokeStyle;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.moveTo(startPoint.x, startPoint.y);
-    ctx.lineTo(currX, currY);
-    ctx.stroke();
+  const updateHistory = (updatedPoints: Point[]) => {
+    setHistory((prevHistory) => {
+      const newHistory = [...prevHistory];
+      newHistory[newHistory.length - 1].points = updatedPoints;
+      return newHistory;
+    });
+  };
+
+  function drawLine(ctx: CanvasRenderingContext2D) {
+    history.forEach((path) => {
+      const strokeStyle =
+        path.strokeConfig.type === "eraser" ? eraserColor : path.strokeColor;
+
+      path.points.forEach((point, index) => {
+        if (index === 0) return;
+        const prevPoint = path.points[index - 1];
+        ctx.beginPath();
+        ctx.lineWidth = path.strokeConfig.width;
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.moveTo(prevPoint.x, prevPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+      });
+    });
   }
 
   return (
@@ -67,14 +109,14 @@ export default function Canvas() {
         }}
         handleInputChange={handleInputChange}
         handleToolSelection={handleToolSelection}
-        handleTrashClick={handleTrashClick}
+        handleClearClick={handleClearClick}
         toggleColorPickerVisibility={() => {
           setShowColorPicker(!showColorPicker);
         }}
       />
       <canvas
         ref={canvasRef}
-        onMouseDown={onMouseDown}
+        onMouseDown={handleMouseDown}
         className="w-screen h-[94vh]"
       ></canvas>
     </div>

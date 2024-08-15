@@ -2,13 +2,13 @@ import React from "react";
 import ToolTip from "./ToolTip";
 
 type ToolButtonProps = {
-  isSelected: boolean;
+  isSelected?: boolean;
   icon: JSX.Element;
   tooltipText?: string;
 };
 
 const ToolButton: React.FC<ToolButtonProps> = ({
-  isSelected,
+  isSelected = false,
   icon,
   tooltipText,
 }) => {

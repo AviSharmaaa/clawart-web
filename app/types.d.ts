@@ -15,3 +15,9 @@ type StrokeConfig = {
     type: StrokeType;
     width: number;
 };
+
+type Path = {
+    points: Point[]
+    strokeColor: string;
+    strokeConfig: StrokeConfig
+}

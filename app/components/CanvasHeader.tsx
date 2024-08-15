@@ -17,7 +17,7 @@ type CanvasHeaderProps = {
   handleInputClick: () => void;
   handleInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
   handleToolSelection: (strokeType: StrokeType) => void;
-  handleTrashClick: () => void;
+  handleClearClick: () => void;
   toggleColorPickerVisibility: () => void;
 };
 
@@ -30,7 +30,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
   handleInputClick,
   handleInputChange,
   handleToolSelection,
-  handleTrashClick,
+  handleClearClick,
   toggleColorPickerVisibility,
 }) => {
   return (
@@ -110,19 +110,16 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
       <div className="flex items-center">
         <ToolButton
           icon={<LuUndo size={20} color="#fff" onClick={() => {}} />}
-          isSelected={strokeSetting.type === "pen"}
           tooltipText="Undo"
         />
         <ToolButton
           icon={<LuRedo size={20} color="#fff" onClick={() => {}} />}
-          isSelected={strokeSetting.type === "pen"}
           tooltipText="Redo"
         />
         <ToolButton
           icon={
-            <IoTrashOutline size={20} color="#fff" onClick={handleTrashClick} />
+            <IoTrashOutline size={20} color="#fff" onClick={handleClearClick} />
           }
-          isSelected={strokeSetting.type === "pen"}
           tooltipText="Clear"
         />
       </div>
