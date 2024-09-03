@@ -1,7 +1,14 @@
-import React from "react";
+"use client";
+import database from "@/app/services/database";
+import React, { useEffect } from "react";
 
-function Home() {
+export default function Home() {
+  const getCanvases = async () => {
+    await database.getCanvases();
+  };
+
+  useEffect(() => {
+    getCanvases();
+  }, []);
   return <div>Home</div>;
 }
-
-export default Home;
